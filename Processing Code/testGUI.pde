@@ -144,11 +144,11 @@ void draw(){ // same as loop in arduino
  
   // maintain current roll position
   if(maintainRoll == true && auto == true){
-    if(commandSentRoll == false){
+    //if(commandSentRoll == false){
       port.write('m');
       println("maintain Roll ON");
       commandSentRoll = true;
-    }
+   // }
   }else{
       commandSentRoll = false;
   }
