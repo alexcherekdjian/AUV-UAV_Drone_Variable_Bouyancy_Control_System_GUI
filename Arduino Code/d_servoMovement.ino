@@ -15,9 +15,6 @@ void modulate_z(float event_z, float current_z) {
     
     normalize_position(linear_current_R);
     normalize_position(linear_current_L);
-    
-    //LINEAR100_R.attach(LINEAR100PIN2, LINEAR100_MIN, LINEAR100_MAX);
-    //LINEAR100_L.attach(LINEAR100PIN1, LINEAR100_MIN, LINEAR100_MAX);
 
     LINEAR100_L.writeMicroseconds(linear_current_L); // fix
     LINEAR100_R.writeMicroseconds(linear_current_R); // fix
@@ -29,9 +26,6 @@ void modulate_z(float event_z, float current_z) {
     
     normalize_position(linear_current_R);
     normalize_position(linear_current_L);
-    
-    //LINEAR100_R.attach(LINEAR100PIN2, LINEAR100_MIN, LINEAR100_MAX);
-    //LINEAR100_L.attach(LINEAR100PIN1, LINEAR100_MIN, LINEAR100_MAX);
 
     LINEAR100_L.writeMicroseconds(linear_current_L); // fix
     LINEAR100_R.writeMicroseconds(linear_current_R);
@@ -56,9 +50,6 @@ void modulate_both(float event_pressure, float current_pressure) {
     normalize_position(linear_current_R);
     normalize_position(linear_current_L);
 
-    //LINEAR100_R.attach(LINEAR100PIN2, LINEAR100_MIN, LINEAR100_MAX);
-    //LINEAR100_L.attach(LINEAR100PIN1, LINEAR100_MIN, LINEAR100_MAX);
-
     LINEAR100_L.writeMicroseconds(linear_current_L); // fix
     LINEAR100_R.writeMicroseconds(linear_current_R); // fix
 
@@ -68,9 +59,6 @@ void modulate_both(float event_pressure, float current_pressure) {
 
     normalize_position(linear_current_R);
     normalize_position(linear_current_L);
-
-    //LINEAR100_R.attach(LINEAR100PIN2, LINEAR100_MIN, LINEAR100_MAX);
-    //LINEAR100_L.attach(LINEAR100PIN1, LINEAR100_MIN, LINEAR100_MAX);
 
     LINEAR100_L.writeMicroseconds(linear_current_L); // fix
     LINEAR100_R.writeMicroseconds(linear_current_R); // fix

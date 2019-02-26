@@ -77,8 +77,15 @@ void loop(void)
       //
       //      }
 
-      
-      modulate_z(event.orientation.z, 5.5);
+      while (val == 'm'){
+        modulate_z(event.orientation.z, 5.5);
+
+        if(Serial.available()){
+          if(Serial.peek() != 'm'){
+            break;
+          }
+        }
+      }
       // eventually need to quit out if user calls another command
 
     } else if (val == 'e' ) {
@@ -92,15 +99,27 @@ void loop(void)
       //        update_pressure = false; // set bool to false
       //
       //      }
+     
+     while (val == 'e'){
 
-      modulate_both(sensor.pressure(), 1060);
-
+        modulate_both(sensor.pressure(), 1060);
+        
+        if(Serial.available()){
+          if(Serial.peek() != 'e'){
+            break;
+          }
+        }
+      }
     } else if(val == 'p'){
         // write the current z orientation to gui to print
 
+        String out = String(event.orientation.z, 4);
+        out += ",";
+        out += String(sensor.pressure());
         
-         Serial.println(event.orientation.z,4);
-        
+         //Serial.println(event.orientation.z,4);
+
+         Serial.println(out);
         // write the current pressure->depth reading to gui to print
          //Serial.print(sensor.pressure());
       

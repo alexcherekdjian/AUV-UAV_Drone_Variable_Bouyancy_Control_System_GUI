@@ -1,5 +1,6 @@
 String message;
-boolean firstData = true;
+boolean recvInProgress = false;
+boolean newData = false;
 float orientation_z_value = 0.0;
 float pressure_value = 0.0;
 
@@ -8,29 +9,26 @@ void serialEvent(Serial p) {
   
 
    //char endMarker = '>';
+  
 
     
   if (port.available() > 0){
-      
-     message = port.readStringUntil(13); // 'new line'
-     
-     if(message != null){ 
-       if(firstData){
-          orientation_z_value = float(message);
-          println("orientation: " + orientation_z_value);
-         // firstData = false;
-          
-       }else{
-          //pressure_value = float(message);
-          //println("pressure: " + pressure_value);
-          //firstData = true;
-       }
+
+       // wait
+       message = port.readStringUntil(13); // 'new line'       
+      if(message != null){ 
+       
+       //parseData();
+    
      }
   }
- 
 }
 
-void parseData() {      // split the data into its parts
+//void parseData() {      // split the data into its parts
+
+//  char strtokIndx;
+//  strtokIndx = strtok(message, ","); // this continues where the previous call left off
+//  orientation_z_value = atoi(strtokIndx);     // convert this part to an integer
 
   
-}
+//}

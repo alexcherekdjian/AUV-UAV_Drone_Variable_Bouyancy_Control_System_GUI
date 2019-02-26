@@ -8,7 +8,9 @@ PFont font1;
 PFont font2;
 
 boolean maintainRoll = false;
+boolean commandSentRoll = false;
 boolean maintainDepth = false;
+boolean commandSentDepth = false;
 
 boolean auto = false;
 boolean manual = false;
@@ -130,24 +132,26 @@ void draw(){ // same as loop in arduino
   
   // maintain current depth position
   if(maintainDepth == true && auto == true){
-        port.write('e');
-        println("maintain Depth ON");
-        //delay(100);
+        if(commandSentDepth == false){
+          port.write('e');
+          println("maintain Depth ON");
+          commandSentDepth = true;
+        }
   }else{
+        commandSentDepth = false;
       // println("maintain depth turned off");
   }
-  
+ 
   // maintain current roll position
   if(maintainRoll == true && auto == true){
+    if(commandSentRoll == false){
       port.write('m');
       println("maintain Roll ON");
+      commandSentRoll = true;
+    }
   }else{
-      // println("maintain roll turned off");
+      commandSentRoll = false;
   }
-  
-     // if (port.available() > 0 ) {
-         //println("Z: " + value);
-   // }
-  
+
   serialEvent(port);
 }
