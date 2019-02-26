@@ -15,8 +15,6 @@ void loop(void)
   /* Optional: Display sensor status (debug only) */
   //displaySensorStatus();
 
-  Serial.println(event.orientation.z,4);
-
   // servo logic
   if (Serial.available()) {
     
@@ -79,15 +77,8 @@ void loop(void)
       //
       //      }
 
-      //while (val == 'm'){
-        modulate_z(event.orientation.z, 0.0);
-
-//        if(Serial.available()){
-//          if(Serial.peek() != 'm'){
-//            break;
-//          }
-//        }
-//      }
+      
+      modulate_z(event.orientation.z, 5.5);
       // eventually need to quit out if user calls another command
 
     } else if (val == 'e' ) {
@@ -101,27 +92,15 @@ void loop(void)
       //        update_pressure = false; // set bool to false
       //
       //      }
-     
-    // while (val == 'e'){
 
-        modulate_both(sensor.pressure(), 1060);
-        
-//        if(Serial.available()){
-//          if(Serial.peek() != 'e'){
-//            break;
-//          }
-//        }
-//      }
+      modulate_both(sensor.pressure(), 1060);
+
     } else if(val == 'p'){
         // write the current z orientation to gui to print
 
-        String out = String(event.orientation.z, 4);
-        out += ",";
-        out += String(sensor.pressure());
         
-         //Serial.println(event.orientation.z,4);
-
-         Serial.println(out);
+         Serial.println(event.orientation.z,4);
+        
         // write the current pressure->depth reading to gui to print
          //Serial.print(sensor.pressure());
       

@@ -3,6 +3,8 @@
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 #include <Servo.h>
+#include <SPI.h>
+#include <SD.h>
 #include "MS5837.h"
 
 #define BNO055_SAMPLERATE_DELAY_MS (100) // Set the delay between fresh samples
@@ -43,5 +45,8 @@ boolean newData = false;
 int left_input = LINEAR100_MIN;
 int right_input = LINEAR100_MIN;
 
+// Write to / Read from SD Card
+File myFile;
+String fname = "sensorData.txt";
 
 sensors_event_t event;
