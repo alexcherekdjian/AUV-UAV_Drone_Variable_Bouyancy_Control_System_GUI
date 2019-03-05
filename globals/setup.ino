@@ -3,17 +3,17 @@ void setup(void)
   Serial.begin(9600);
   //Serial.println("Orientation Sensor Test"); Serial.println("");
 
-  // Set up for SD card
-  Serial.print("Initializing SD card...");
-
-  if (!SD.begin(4)) {
-    Serial.println("Initialization failed");
-    while(1);
-  }
-  Serial.println("Initialization successful");
-
-  myFile = SD.open(fname, FILE_WRITE);
-  // End of set up
+//  // Set up for SD card
+//  Serial.print("Initializing SD card...");
+//
+//  if (!SD.begin(CS)) {
+//    Serial.println("Initialization failed");
+//    while(1);
+//  }
+//  Serial.println("Initialization successful");
+//
+//  myFile = SD.open(fname, FILE_WRITE);
+//  // End of set up
 
   // attaches/activates the linear actuator as a servo object
   LINEAR100_L.attach(LINEAR100PIN1, LINEAR100_MIN, LINEAR100_MAX);

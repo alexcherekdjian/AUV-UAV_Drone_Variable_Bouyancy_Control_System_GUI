@@ -11,6 +11,7 @@ void recvWithStartEndMarkers() {
         if (recvInProgress == true) {
             if (rc != endMarker) {
                 receivedChars[ndx] = rc;
+                
                 ndx++;
                 if (ndx >= numChars) {
                     ndx = numChars - 1;

@@ -2,27 +2,35 @@ void loop(void)
 {
 
   /* Get a new sensor event */
-
   // get orientation data
   bno.getEvent(&event);
 
   // get pressure data
-  sensor.read();
+  //myFile.println(sensor.read());
 
   /* Optional: Display calibration status */
   //displayCalStatus();
 
   /* Optional: Display sensor status (debug only) */
   //displaySensorStatus();
-
+  //serialEvent();
   // servo logic
   if (Serial.available()) {
+    //Serial.println("Serial available"); // does not print on the processing side (under the message)
+    // so either, not reaching this loop, or the format of message is not correct.
+    // Will try and confirm this weekend. 
+    // since i don't have an arduino i cannot test...
     
     char val = Serial.read();
+   // char val = 'p';
 
     if (val == 'l') {
       // manual overide set servos to certain values
-
+      //Serial.println(val);
+      Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
       // recieve two bytes that denote left and right servo position
       recvWithStartEndMarkers();
       
@@ -45,6 +53,7 @@ void loop(void)
 
     } else if (val == 'd') {
       // go down (fill both servos completely)
+      Serial.println("Filling both servos completely");
       update_z = true;
       update_pressure = true;
 
@@ -56,6 +65,11 @@ void loop(void)
 
     } else if (val == 'u') {
       // go up (empty both servos completely)
+      //Serial.println("Emptying both servos completely");
+      Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
       update_z = true;
       update_pressure = true;
 
@@ -67,59 +81,48 @@ void loop(void)
 
       
     } else if (val == 'm') {
-     
-      // maintain current roll
-      //update_pressure = true;
 
-      //      if(update_z){
-      //        current_z = event.orientation.z; // update current z value to current maintain value
-      //        update_z = false; // set bool to false
-      //
-      //      }
-
-      
+      Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
       modulate_z(event.orientation.z, 5.5);
       // eventually need to quit out if user calls another command
 
     } else if (val == 'e' ) {
       // maintain current depth
       //update_z = true; // may be wrong logic
-
-      //      if(update_pressure){
-      //        current_pressure = sensor.pressure(); // update current pressure value to current maintain value
-      //        //current_depth = current_pressure * 0.01; // converting mbar -> meters
-      //
-      //        update_pressure = false; // set bool to false
-      //
-      //      }
+      //Serial.println("In maintain current depth");
+      Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
 
       modulate_both(sensor.pressure(), 1060);
 
     } else if(val == 'p'){
         // write the current z orientation to gui to print
 
-        
-         Serial.println(event.orientation.z,4);
+        //figure out how to stream data onto the gui
+         Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
         
         // write the current pressure->depth reading to gui to print
-         //Serial.print(sensor.pressure());
+        //Serial.print(sensor.pressure());
       
     } else if (val == 'k') {
-
+      Serial.write("In K");
       // kill switch
       LINEAR100_L.writeMicroseconds(LINEAR100_MIN); // fix
       LINEAR100_R.writeMicroseconds(LINEAR100_MIN); // fix
 
     }
-
-
-    
-    //    else {
-    //      update_z = true;
-    //      update_pressure = true;
-    //
-    //    }
-
+    delay(50);
+  } else {
+   //Serial.println("1 2 3");
+    //will print on the processing side.
   }
   /* Wait the specified delay before requesting nex data */
   delay(BNO055_SAMPLERATE_DELAY_MS);

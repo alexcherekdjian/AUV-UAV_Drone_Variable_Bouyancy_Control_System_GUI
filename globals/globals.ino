@@ -47,6 +47,10 @@ int right_input = LINEAR100_MIN;
 
 // Write to / Read from SD Card
 File myFile;
-String fname = "sensorData.txt";
+String fname = "sData.txt";
+const uint8_t CS = 53;
+
+String inputString = "serial event";
+bool stringComplete = false;
 
 sensors_event_t event;
