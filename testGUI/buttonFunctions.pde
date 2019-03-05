@@ -1,5 +1,4 @@
 /* Button Functions */ 
-
 void bar(int n){
   switch(n){
     
@@ -18,15 +17,14 @@ void bar(int n){
 void enter(){
   
   if(manual == true){
-     println("'l' written to serial out");
      
      int left_value = ((int)cp5.getController("Left Servo").getValue() - 1050)/5;
      int right_value = ((int)cp5.getController("Right Servo").getValue() - 1050)/5; // convert back == right_value * 5 +1050
      
      String out = "<" + left_value + "," + right_value + ">";
      
-     println("'l' written to serial out");
-     println("Data out: " + out);
+     println("Command sent to servo");
+     println("Position: " + out);
      port.write('l');
      port.write(out);
       
@@ -38,7 +36,7 @@ void depthUp(){
   
   if(manual == true){
     port.write('u');  
-    println("'u' written to serial out");
+    println("Depth Up");
   }
 }
 
@@ -47,13 +45,21 @@ void depthDown(){
 
   if(manual == true){
     port.write('d');  
-    println("'d' written to serial out");
+    println("Depth Down");
   }
 }
 
 void killSwitch(){
-  if(manual == true || auto == true){
-    port.write('k');
-    println("'k' written to serial out");
-  }
+  //if(manual == true || auto == true){
+    char k = 'k';
+    port.write(k);
+    print(k);
+    println("Reset");
+ // }
+}
+
+void pressure() {
+  port.write('p');
+  println("Pressure reading test");
+ 
 }

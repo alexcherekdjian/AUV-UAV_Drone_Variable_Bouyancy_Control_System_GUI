@@ -7,16 +7,13 @@ ControlP5 cp5;
 PFont font1;
 PFont font2;
 
+boolean test = true;
+
 boolean maintainRoll = false;
-boolean commandSentRoll = false;
 boolean maintainDepth = false;
-boolean commandSentDepth = false;
 
 boolean auto = false;
 boolean manual = false;
-
-
-
 
 int [] serialInArray; // buffer for reading values
 
@@ -28,7 +25,8 @@ void setup(){ // same as arduino
   // print(PFont.list()); // list all the fonts
   
   printArray(Serial.list()); // prints all available serial ports
-  port = new Serial(this, Serial.list()[3], 9600);
+  port = new Serial(this, Serial.list()[19], 9600);
+  
   
   // fonts
   font1 = createFont("Waseem", 20);
@@ -111,11 +109,17 @@ void setup(){ // same as arduino
        .setPosition(150, 25)
        .setFont(font1)
       ;    
+  
+  cp5.addButton("pressure")
+    .setPosition(250, 500) // x and y coordinate of upper left corner of button
+    .setSize(20, 40) // (width , height)
+    .setFont(font1)
+    .setLabel("button")
+  ;
 
 }
 
 void draw(){ // same as loop in arduino
-  
    background(50); // window backgorund color (r,g,b) or (0-255)
    
    //text("AUV/UAV Test GUI", 195, 30); // ("text", x coordinate, y coordinate)
@@ -132,26 +136,29 @@ void draw(){ // same as loop in arduino
   
   // maintain current depth position
   if(maintainDepth == true && auto == true){
-        if(commandSentDepth == false){
-          port.write('e');
-          println("maintain Depth ON");
-          commandSentDepth = true;
-        }
+        port.write('e');
+        println("maintain Depth ON");
+        //delay(100);
   }else{
-        commandSentDepth = false;
       // println("maintain depth turned off");
   }
- 
+  
   // maintain current roll position
   if(maintainRoll == true && auto == true){
-    //if(commandSentRoll == false){
       port.write('m');
       println("maintain Roll ON");
-      commandSentRoll = true;
-   // }
   }else{
-      commandSentRoll = false;
+      // println("maintain roll turned off");
   }
-
-  serialEvent(port);
+ 
+  //if (test == true) {
+  //  port.write('p');
+  //  println("PRESSURE READING TEST");
+  //  serialEvent(port);
+  //}
+  //port.write('p');
+  //println("pressure test");
+  serialEvent();
+  
+ // serialEvent(port);
 }
