@@ -17,15 +17,20 @@ boolean manual = false;
 
 int [] serialInArray; // buffer for reading values
 
+PFont f;
+
 void setup(){ // same as arduino
+  f = createFont("Arial", 16, true);
+
+  //size(200,250);
   
-  size (500, 600); // window size (width, height)
+  size (500, 750); // window size (width, height)
   cp5 = new ControlP5(this); // object creation
   
   // print(PFont.list()); // list all the fonts
   
   printArray(Serial.list()); // prints all available serial ports
-  port = new Serial(this, Serial.list()[19], 9600);
+  port = new Serial(this, Serial.list()[14], 9600);
   
   
   // fonts
@@ -37,14 +42,14 @@ void setup(){ // same as arduino
     .setPosition(50, 80) // x and y coordinate of upper left corner of button
     .setSize(160, 80) // (width , height)
     .setFont(font1)
-    .setLabel("Depth  Up")
+    .setLabel("Ascend")
   ;
   
   cp5.addButton("depthDown")
     .setPosition(275, 80) // x and y coordinate of upper left corner of button
     .setSize(160, 80) // (width , height)
     .setFont(font1)
-    .setLabel("Depth  Down")
+    .setLabel("Descend")
   ;
  
     cp5.addButton("killSwitch")
@@ -150,6 +155,16 @@ void draw(){ // same as loop in arduino
   }else{
       // println("maintain roll turned off");
   }
+  
+  fill(0);
+  String inBuffer = serialEvent();
+  //String inBuffer = port.readString();
+  fill(255);
+  rect(100,600,300,140);
+  textFont(f,16);
+  fill(0);
+  text("" + inBuffer , 120, 620);
+  //text("" + inBuffer, 10, 100);
  
   //if (test == true) {
   //  port.write('p');
@@ -158,7 +173,7 @@ void draw(){ // same as loop in arduino
   //}
   //port.write('p');
   //println("pressure test");
-  serialEvent();
+  //serialEvent();
   
  // serialEvent(port);
 }

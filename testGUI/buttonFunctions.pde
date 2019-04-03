@@ -36,7 +36,7 @@ void depthUp(){
   
   if(manual == true){
     port.write('u');  
-    println("Depth Up");
+    println("Ascend");
   }
 }
 
@@ -45,7 +45,7 @@ void depthDown(){
 
   if(manual == true){
     port.write('d');  
-    println("Depth Down");
+    println("Descend");
   }
 }
 
@@ -53,7 +53,7 @@ void killSwitch(){
   //if(manual == true || auto == true){
     char k = 'k';
     port.write(k);
-    print(k);
+   // print(k);
     println("Reset");
  // }
 }
