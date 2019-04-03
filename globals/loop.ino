@@ -5,6 +5,27 @@ void loop(void)
   // get orientation data
   bno.getEvent(&event);
 
+
+  sensor.read();
+
+  Serial.print("Pressure: "); 
+  Serial.print(sensor.pressure()); 
+  Serial.println(" mbar");
+  
+  Serial.print("Temperature: "); 
+  Serial.print(sensor.temperature()); 
+  Serial.println(" deg C");
+  
+  Serial.print("Depth: "); 
+  Serial.print(sensor.depth()); 
+  Serial.println(" m");
+  
+  Serial.print("Altitude: "); 
+  Serial.print(sensor.altitude()); 
+  Serial.println(" m above mean sea level");
+
+  delay(1000);
+
   // get pressure data
   //myFile.println(sensor.read());
 
@@ -16,11 +37,6 @@ void loop(void)
   //serialEvent();
   // servo logic
   if (Serial.available()) {
-    //Serial.println("Serial available"); // does not print on the processing side (under the message)
-    // so either, not reaching this loop, or the format of message is not correct.
-    // Will try and confirm this weekend. 
-    // since i don't have an arduino i cannot test...
-    
     char val = Serial.read();
    // char val = 'p';
 
@@ -28,9 +44,8 @@ void loop(void)
       // manual overide set servos to certain values
       //Serial.println(val);
       Serial.print(event.orientation.z,4);
-        Serial.print(", ");
-        //Serial.write("HELLO");
-        Serial.println(sensor.pressure());
+      Serial.print(", ");
+      Serial.println(sensor.pressure());
       // recieve two bytes that denote left and right servo position
       recvWithStartEndMarkers();
       
@@ -42,7 +57,6 @@ void loop(void)
 
         newData = false;
       }
-
         // write to servos
         LINEAR100_R.writeMicroseconds(right_input); // MAX: syringe full
         LINEAR100_L.writeMicroseconds(left_input); // MAX: syringe full
@@ -53,7 +67,9 @@ void loop(void)
 
     } else if (val == 'd') {
       // go down (fill both servos completely)
-      Serial.println("Filling both servos completely");
+      Serial.print(event.orientation.z,4);
+      Serial.print(", ");
+      Serial.println(sensor.pressure());
       update_z = true;
       update_pressure = true;
 
@@ -66,7 +82,7 @@ void loop(void)
     } else if (val == 'u') {
       // go up (empty both servos completely)
       //Serial.println("Emptying both servos completely");
-      Serial.print(event.orientation.z,4);
+       Serial.print(event.orientation.z,4);
         Serial.print(", ");
         //Serial.write("HELLO");
         Serial.println(sensor.pressure());
@@ -113,7 +129,10 @@ void loop(void)
         //Serial.print(sensor.pressure());
       
     } else if (val == 'k') {
-      Serial.write("In K");
+      Serial.print(event.orientation.z,4);
+        Serial.print(", ");
+        //Serial.write("HELLO");
+        Serial.println(sensor.pressure());
       // kill switch
       LINEAR100_L.writeMicroseconds(LINEAR100_MIN); // fix
       LINEAR100_R.writeMicroseconds(LINEAR100_MIN); // fix
