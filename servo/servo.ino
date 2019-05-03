@@ -1,52 +1,73 @@
-/*************************************************** 
-  This is an example for our Adafruit 16-channel PWM & Servo driver
-  Servo test - this will drive 8 servos, one after the other on the
-  first 8 pins of the PCA9685
-
-  Pick one up today in the adafruit shop!
-  ------> http://www.adafruit.com/products/815
-  
-  These drivers use I2C to communicate, 2 pins are required to  
-  interface.
-
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
-  BSD license, all text above must be included in any redistribution
- ****************************************************/
-
+#include <math.h>
+#include <Servo.h>
 #include <Wire.h>
 #include "MS5837.h"
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+#include <Adafruit_PWMServoDriver.h>
 #include <PID_v1.h>
-//double Setpoint; // end dest
-double Input; // event data
-double Output; // linear_current_L ex. servo current position
-double Kp;
-double Ki;
-double Kd; 
 
-//PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT); // kp,ki,kd
+
+#define SERVOMIN  240 // small safe max = 360 large safe max = 380
+#define SERVOMAX  360  
+
+#define BNO055_SAMPLERATE_DELAY_MS (100)
+#define thrust_pin 9
+
+bool printstart = true;
+bool printstop = true;
+bool printup = true;
+
+Servo esc;
+
+// 274
+double Setpoint_depth; // end dest
+double Input_depth; // event data
+double Output_depth; // linear_current_L ex. servo current position
+
+double Setpoint_roll; // end dest
+double Input_roll; // event data
+double Output_roll; // linear_current_L ex. servo current position
+
+double Setpoint_pitch; // end dest
+double Input_pitch; // event data
+double Output_pitch; // linear_current_L ex. servo current position
+
+
+double Kp = 125.0; // 2
+double Ki = 7.5; // 2
+double Kd = 0.0;
+
+// 0 = left, 1 = front, 2 = right 
+bool use_pid_depth = false;
+bool use_pid_roll_left = false;
+bool use_pid_pitch = false;
+
+bool use_thruster = true;
+
+bool hard_reset = true;
+
+//The esc takes between 1100 and 1900. 1500 is neutral
+int thrust = 1900; // pwm thrust value 
+
+PID depth_PID(&Input_depth, &Output_depth, &Setpoint_depth, Kp, Ki, Kd, DIRECT); // kp,ki,kd
+PID roll_PID(&Input_roll, &Output_roll, &Setpoint_roll, Kp, Ki, Kd, DIRECT); // kp,ki,kd
+PID pitch_PID(&Input_pitch, &Output_pitch, &Setpoint_pitch, Kp, Ki, Kd, REVERSE); // kp,ki,kd
 
 MS5837 sensor;
-#include <Adafruit_PWMServoDriver.h>
+
 
 // called this way, it uses the default address 0x40
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-#define SERVOMIN  250 // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  380 // this is the 'maximum' pulse length count (out of 4096)
 
-#define BNO055_SAMPLERATE_DELAY_MS (100)
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
 bool fuck = true;
+
 
 sensors_event_t event;
 
@@ -55,8 +76,8 @@ int linear_current_L = SERVOMIN;
 int linear_current_R = SERVOMIN;
 int linear_current_F = SERVOMIN;
 
-// for goup and godown functioncs
-int current_degrees = 0;
+// for goup and godown functioncs without PID
+int current_degrees = 360;
 
 void setup() {
    Serial.begin(9600);
@@ -82,9 +103,7 @@ void setup() {
   bno.setExtCrystalUse(true);
 
   Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
-  
-  Serial.println("8 channel Servo test!");
-
+ 
 
   Wire.begin();
 
@@ -108,22 +127,51 @@ void setup() {
   // 0 = left, 1 = front, 2 = right 
 
  
-  pwm.setPWM(0, 0, 240); // pin number , 0, final position (240 - 400) (-5) (235, 240)
-  pwm.setPWM(1, 0, 240);
-  pwm.setPWM(2, 0, 240);
-  //godown(180, 0);
-
+  //pwm.setPWM(0, 0, 240); // pin number , 0, final position (240 - 400) (-5) (235, 240)
+  //pwm.setPWM(2, 0, 240);
+  //godown_PID(360, 1);
+ 
   
   //pwm.setPWM(0, 0, 235); // pin number , 0, final position (240 - 400) (-5) (235, 240)
   //pwm.setPWM(2, 0, 240);
-  //goup(10, 0);
+  //goup_PID(240, 1);
 
+  if(hard_reset){
+    pwm.setPWM(0, 0, 240); // pin number , 0, final position (240 - 400) (-5) (235, 240)
+    pwm.setPWM(1, 0, 240); // -3 not pitched, pitched up -10
+    pwm.setPWM(2, 0, 240);
+    
+  }
 
-
-  //myPID.SetMode(AUTOMATIC);
-  //myPID.SetOutputLimits(SERVOMIN, SERVOMAX);
-
+  Serial.println("Waiting delay . . .");
+  delay(500);
   
+  Serial.println("Setting Mode . . .");
+  depth_PID.SetMode(AUTOMATIC);
+  roll_PID.SetMode(AUTOMATIC);
+  pitch_PID.SetMode(AUTOMATIC);
+  Serial.println("Setting Min and Max . . .");
+  Serial.print("Servomin: ");
+  Serial.println(SERVOMIN);
+  Serial.print("Servomax: ");
+  Serial.println(SERVOMAX);
+  
+  depth_PID.SetOutputLimits(SERVOMIN, SERVOMAX);
+  roll_PID.SetOutputLimits(SERVOMIN, SERVOMAX);
+  pitch_PID.SetOutputLimits(SERVOMIN, SERVOMAX);
+
+  Serial.println("Attaching Thruster . . .");
+  esc.attach(thrust_pin);
+  esc.writeMicroseconds(1500);
+  Serial.println("Thruster 7000 delay . . .");
+  delay(7000);
+  Serial.println("Thruster Complete");
+
+  Serial.println("");
+
+  Serial.println("Loop Entered");
+  Serial.println(""); 
+  Serial.println("");
 }
 
 void wasteTime(){
@@ -131,6 +179,35 @@ void wasteTime(){
   while(fuck){
     
   }  
+}
+
+void godown_PID(int dest_degrees, int delay_mult){
+
+      while(dest_degrees != linear_current_F){
+            linear_current_F++;
+            
+            normalize_position(linear_current_F);
+            pwm.setPWM(1, 0, linear_current_F);
+            //pwm.setPWM(1, 0, current_pl);
+
+            delay(70*delay_mult); // * 2 is real slow
+      }
+    fuck = false;
+
+}
+
+void goup_PID(int dest_degrees, int delay_mult){
+
+      while(dest_degrees != linear_current_F){
+            linear_current_F--;
+            
+            normalize_position(linear_current_F);
+            pwm.setPWM(1, 0, linear_current_F);
+
+            delay(70*delay_mult); // * 2 is real slow
+      }
+    fuck = false;
+
 }
 
 void godown(int dest_degrees, int delay_mult){
@@ -158,7 +235,8 @@ void goup(int dest_degrees, int delay_mult){
 
             pwm.setPWM(1, 0, current_pl);
             //pwm.setPWM(1, 0, current_pl);
-
+            
+          
             delay(-1*delay_calc*delay_mult); // * 2 is real slow
       }
     //delay(1500);
@@ -168,6 +246,16 @@ void goup(int dest_degrees, int delay_mult){
 
 
 void normalize_position(int &current) {
+  if (current < SERVOMIN) {
+    current = SERVOMIN;
+
+  } else if (current > SERVOMAX) {
+    current = SERVOMAX;
+  }
+}
+
+
+void normalize_position_double(double &current) {
   if (current < SERVOMIN) {
     current = SERVOMIN;
 
